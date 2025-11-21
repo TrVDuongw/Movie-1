@@ -9,7 +9,7 @@ public class RapController {
         phimDAO = new PhimDAO();
         VeDAO = new VeDAO();
 
-        // Kiểm tra nếu database trống thì thêm dữ liệu mẫu
+  
         if (getDanhSachPhim().isEmpty()) {
             addPhim(new Phim("Avengers: Endgame", "Hanh dong", 181, 5, 8));
             addPhim(new Phim("Conan Movie 26", "Trinh tham", 110, 5, 7));
@@ -17,22 +17,22 @@ public class RapController {
         }
     }
 
-    // Lấy danh sách phim từ database
+
     public ArrayList<Phim> getDanhSachPhim() {
         return phimDAO.getAllPhim();
     }
 
-    // Lấy danh sách vé từ database
+
     public ArrayList<Ve> getDanhSachVe() {
         return VeDAO.getAllVe();
     }
 
-    // Thêm phim mới
+
     public void addPhim(Phim p) {
         phimDAO.addPhim(p);
     }
 
-    // Xóa phim
+
     public boolean removePhim(int index) {
         ArrayList<Phim> list = getDanhSachPhim();
         if (index >= 0 && index < list.size()) {
@@ -42,12 +42,12 @@ public class RapController {
         return false;
     }
 
-    // Thêm vé
+
     public void addVe(Ve v) {
         VeDAO.addVe(v);
     }
 
-    // Đặt ghế
+
     public List<String> bookSeats(int filmIndex, List<String> labels) {
         ArrayList<Phim> list = getDanhSachPhim();
         if (filmIndex < 0 || filmIndex >= list.size()) {
@@ -58,7 +58,7 @@ public class RapController {
 
         Phim phim = list.get(filmIndex);
 
-        // Kiểm tra xem có ghế nào không khả dụng không
+
         List<String> failed = new ArrayList<>();
         for (String lab : labels) {
             int[] rc = phim.labelToRC(lab);
@@ -71,7 +71,6 @@ public class RapController {
             return failed;
         }
 
-        // Đặt ghế và cập nhật database
         for (String lab : labels) {
             int[] rc = phim.labelToRC(lab);
             phim.bookSeat(rc[0], rc[1]);
