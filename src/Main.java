@@ -12,11 +12,11 @@ public class Main extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Thêm window listener để đóng database connection khi thoát
+
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                DatabaseConnection.closeConnection(); // Gọi được vì static
+                DatabaseConnection.closeConnection(); 
                 System.exit(0);
             }
         });
