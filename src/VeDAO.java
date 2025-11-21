@@ -3,7 +3,6 @@ import java.util.ArrayList;
 
 public class VeDAO {
 
-    // Thêm vé mới vào database
     public boolean addVe(Ve ve) {
         String sql = "INSERT INTO ve (ten_phim, ghe, ten_khach, email) VALUES (?, ?, ?, ?)";
 
