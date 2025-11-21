@@ -23,8 +23,8 @@ public class PhimDAO {
             pstPhim.setInt(3, phim.getThoiLuong());
 
 
-            pstPhim.setInt(4, phim.getSoHangGhe()); // Giả định bạn có getter này
-            pstPhim.setInt(5, phim.getSoCotGhe()); // Giả định bạn có getter này
+            pstPhim.setInt(4, phim.getSoHangGhe()); 
+            pstPhim.setInt(5, phim.getSoCotGhe()); 
 
             pstPhim.executeUpdate();
 
@@ -46,7 +46,7 @@ public class PhimDAO {
                     pstGhe.setInt(1, phimId);
                     pstGhe.setInt(2, r);
                     pstGhe.setInt(3, c);
-                    pstGhe.setBoolean(4, false); // chưa đặt
+                    pstGhe.setBoolean(4, false); 
                     pstGhe.addBatch();
                 }
             }
@@ -73,7 +73,7 @@ public class PhimDAO {
         }
     }
 
-    // Lấy tất cả phim từ database
+
     public ArrayList<Phim> getAllPhim() {
         ArrayList<Phim> list = new ArrayList<>();
         String sql = "SELECT * FROM phim";
@@ -122,7 +122,7 @@ public class PhimDAO {
                 boolean daDat = rs.getBoolean("da_dat");
 
                 if (daDat) {
-                    phim.bookSeat(r, c); // Đánh dấu ghế đã đặt
+                    phim.bookSeat(r, c); 
                 }
             }
         } catch (SQLException e) {
@@ -130,8 +130,7 @@ public class PhimDAO {
         }
     }
 
-    // Xóa phim khỏi database
-    // (Phương thức này không cần thay đổi)
+ 
     public boolean deletePhim(String tenPhim) {
         String sql = "DELETE FROM phim WHERE ten_phim = ?";
 
