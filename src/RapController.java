@@ -1,0 +1,83 @@
+import java.util.ArrayList;
+import java.util.List;
+
+public class RapController {
+    private PhimDAO phimDAO;
+    private VeDAO VeDAO;
+
+    public RapController() {
+        phimDAO = new PhimDAO();
+        VeDAO = new VeDAO();
+
+        // Kiểm tra nếu database trống thì thêm dữ liệu mẫu
+        if (getDanhSachPhim().isEmpty()) {
+            addPhim(new Phim("Avengers: Endgame", "Hanh dong", 181, 5, 8));
+            addPhim(new Phim("Conan Movie 26", "Trinh tham", 110, 5, 7));
+            addPhim(new Phim("Doraemon: Phieu luu", "Hoat hinh", 95, 4, 6));
+        }
+    }
+
+    // Lấy danh sách phim từ database
+    public ArrayList<Phim> getDanhSachPhim() {
+        return phimDAO.getAllPhim();
+    }
+
+    // Lấy danh sách vé từ database
+    public ArrayList<Ve> getDanhSachVe() {
+        return VeDAO.getAllVe();
+    }
+
+    // Thêm phim mới
+    public void addPhim(Phim p) {
+        phimDAO.addPhim(p);
+    }
+
+    // Xóa phim
+    public boolean removePhim(int index) {
+        ArrayList<Phim> list = getDanhSachPhim();
+        if (index >= 0 && index < list.size()) {
+            String tenPhim = list.get(index).getTenPhim();
+            return phimDAO.deletePhim(tenPhim);
+        }
+        return false;
+    }
+
+    // Thêm vé
+    public void addVe(Ve v) {
+        VeDAO.addVe(v);
+    }
+
+    // Đặt ghế
+    public List<String> bookSeats(int filmIndex, List<String> labels) {
+        ArrayList<Phim> list = getDanhSachPhim();
+        if (filmIndex < 0 || filmIndex >= list.size()) {
+            List<String> err = new ArrayList<>();
+            err.add("Phim khong hop le");
+            return err;
+        }
+
+        Phim phim = list.get(filmIndex);
+
+        // Kiểm tra xem có ghế nào không khả dụng không
+        List<String> failed = new ArrayList<>();
+        for (String lab : labels) {
+            int[] rc = phim.labelToRC(lab);
+            if (rc == null || !phim.isSeatAvailable(rc[0], rc[1])) {
+                failed.add(lab);
+            }
+        }
+
+        if (!failed.isEmpty()) {
+            return failed;
+        }
+
+        // Đặt ghế và cập nhật database
+        for (String lab : labels) {
+            int[] rc = phim.labelToRC(lab);
+            phim.bookSeat(rc[0], rc[1]);
+            phimDAO.updateSeatStatus(phim.getTenPhim(), rc[0], rc[1], true);
+        }
+
+        return failed;
+    }
+}
