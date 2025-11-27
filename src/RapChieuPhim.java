@@ -10,6 +10,10 @@ public class RapChieuPhim extends JFrame {
     private JPanel seatPanel;
     private JTextArea areaThongBao;
     private List<JToggleButton> seatButtons;
+    
+    // Giá vé theo loại ghế
+    private static final int GIA_VE_THUONG = 50000;  // 50k
+    private static final int GIA_VE_VIP = 80000;      // 80k (hàng A, B)
 
     public RapChieuPhim(RapController controller) {
         this.controller = controller;
@@ -63,7 +67,9 @@ public class RapChieuPhim extends JFrame {
     private void loadFilmList() {
         model.clear();
         for (Phim p : controller.getDanhSachPhim()) model.addElement(p.toString());
-        areaThongBao.setText("Danh sach phim da duoc cap nhat.");
+        areaThongBao.setText("Danh sach phim da duoc cap nhat.\n" +
+                            "Ghe VIP (hang A, B): " + formatMoney(GIA_VE_VIP) + "\n" +
+                            "Ghe thuong: " + formatMoney(GIA_VE_THUONG));
         seatPanel.removeAll();
         seatPanel.revalidate();
         seatPanel.repaint();
@@ -83,27 +89,106 @@ public class RapChieuPhim extends JFrame {
         Phim p = controller.getDanhSachPhim().get(idx);
         int so_hang_ghe = p.getSoHangGhe();
         int so_cot_ghe = p.getSoCotGhe();
-        seatPanel.setLayout(new GridLayout(so_hang_ghe, so_cot_ghe, 5, 5));
-
+        
         if (p.availableCount() == 0) {
             seatPanel.setLayout(new BorderLayout());
-            seatPanel.add(new JLabel("Phim nay da het ve.Vui long chon phim khac."), BorderLayout.CENTER);
+            seatPanel.add(new JLabel("Phim nay da het ve. Vui long chon phim khac."), BorderLayout.CENTER);
             seatPanel.revalidate();
             seatPanel.repaint();
             return;
         }
 
+        // Tạo panel chính với GridBagLayout để linh hoạt hơn
+        JPanel mainSeatPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(2, 2, 2, 2);
+        
+        // Thêm label "MÀN HÌNH"
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = so_cot_ghe;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        JLabel screenLabel = new JLabel("=== MÀN HÌNH ===", SwingConstants.CENTER);
+        screenLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        screenLabel.setOpaque(true);
+        screenLabel.setBackground(Color.DARK_GRAY);
+        screenLabel.setForeground(Color.WHITE);
+        mainSeatPanel.add(screenLabel, gbc);
+        
+        // Reset gridwidth cho các ghế
+        gbc.gridwidth = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+
+        // Tạo các nút ghế
         for (int r = 0; r < so_hang_ghe; r++) {
             for (int c = 0; c < so_cot_ghe; c++) {
                 String label = p.seatLabel(r, c);
                 boolean available = p.isSeatAvailable(r, c);
-                JToggleButton btn = new JToggleButton(label);
-                btn.setEnabled(available);
-                btn.setBackground(available ? Color.WHITE : Color.LIGHT_GRAY);
-                seatButtons.add(btn);
-                seatPanel.add(btn);
+                
+                // CHỈ TẠO NÚT CHO GHẾ TRỐNG
+                if (available) {
+                    JToggleButton btn = new JToggleButton(label);
+                    btn.setPreferredSize(new Dimension(60, 40));
+                    
+                    // Phân loại ghế VIP và thường
+                    char row = label.charAt(0);
+                    if (row == 'A' || row == 'B') {
+                        btn.setBackground(new Color(255, 215, 0)); // Vàng cho VIP
+                        btn.setToolTipText("Ghe VIP - " + formatMoney(GIA_VE_VIP));
+                    } else {
+                        btn.setBackground(Color.WHITE);
+                        btn.setToolTipText("Ghe thuong - " + formatMoney(GIA_VE_THUONG));
+                    }
+                    
+                    btn.setFont(new Font("Arial", Font.BOLD, 10));
+                    seatButtons.add(btn);
+                    
+                    gbc.gridx = c;
+                    gbc.gridy = r + 1; // +1 vì hàng 0 là màn hình
+                    mainSeatPanel.add(btn, gbc);
+                } else {
+                    // Ghế đã đặt - không hiển thị hoặc hiển thị label disabled
+                    JLabel lblBooked = new JLabel("X", SwingConstants.CENTER);
+                    lblBooked.setPreferredSize(new Dimension(60, 40));
+                    lblBooked.setOpaque(true);
+                    lblBooked.setBackground(Color.LIGHT_GRAY);
+                    lblBooked.setForeground(Color.RED);
+                    lblBooked.setFont(new Font("Arial", Font.BOLD, 14));
+                    lblBooked.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+                    lblBooked.setToolTipText("Ghe da duoc dat");
+                    
+                    gbc.gridx = c;
+                    gbc.gridy = r + 1;
+                    mainSeatPanel.add(lblBooked, gbc);
+                }
             }
         }
+        
+        // Thêm chú thích
+        JPanel legendPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        legendPanel.setBorder(BorderFactory.createTitledBorder("Chu thich"));
+        
+        JLabel vipLegend = new JLabel("■ Ghe VIP (" + formatMoney(GIA_VE_VIP) + ")");
+        vipLegend.setForeground(new Color(255, 215, 0));
+        vipLegend.setFont(new Font("Arial", Font.BOLD, 12));
+        
+        JLabel normalLegend = new JLabel("■ Ghe thuong (" + formatMoney(GIA_VE_THUONG) + ")");
+        normalLegend.setForeground(Color.BLACK);
+        
+        JLabel bookedLegend = new JLabel("X Da dat");
+        bookedLegend.setForeground(Color.RED);
+        bookedLegend.setFont(new Font("Arial", Font.BOLD, 12));
+        
+        legendPanel.add(vipLegend);
+        legendPanel.add(Box.createHorizontalStrut(20));
+        legendPanel.add(normalLegend);
+        legendPanel.add(Box.createHorizontalStrut(20));
+        legendPanel.add(bookedLegend);
+        
+        seatPanel.setLayout(new BorderLayout());
+        seatPanel.add(mainSeatPanel, BorderLayout.CENTER);
+        seatPanel.add(legendPanel, BorderLayout.SOUTH);
+        
         seatPanel.revalidate();
         seatPanel.repaint();
     }
@@ -118,7 +203,9 @@ public class RapChieuPhim extends JFrame {
         Phim p = controller.getDanhSachPhim().get(idx);
         List<String> toBook = new ArrayList<>();
         for (JToggleButton btn : seatButtons) {
-            if (btn.isSelected() && btn.isEnabled()) toBook.add(btn.getText());
+            if (btn.isSelected() && btn.isEnabled()) {
+                toBook.add(btn.getText());
+            }
         }
 
         if (toBook.isEmpty()) {
@@ -126,23 +213,174 @@ public class RapChieuPhim extends JFrame {
             return;
         }
 
-        List<String> failed = controller.bookSeats(idx, toBook);
-        if (!failed.isEmpty()) {
-            areaThongBao.setText("Ghe da duoc dat: " + failed);
+        // Tính tổng tiền
+        int tongTien = 0;
+        for (String ghe : toBook) {
+            char row = ghe.charAt(0);
+            if (row == 'A' || row == 'B') {
+                tongTien += GIA_VE_VIP;
+            } else {
+                tongTien += GIA_VE_THUONG;
+            }
+        }
+
+        // Hiển thị thông tin đặt vé và xác nhận
+        String thongTinDat = "Ban dang dat:\n" +
+                            "Phim: " + p.getTenPhim() + "\n" +
+                            "So ghe: " + toBook.size() + " (" + String.join(", ", toBook) + ")\n" +
+                            "Tong tien: " + formatMoney(tongTien) + "\n\n" +
+                            "Ban co muon tiep tuc?";
+        
+        int confirm = JOptionPane.showConfirmDialog(this, thongTinDat, 
+                                                    "Xac nhan dat ve", 
+                                                    JOptionPane.YES_NO_OPTION);
+        if (confirm != JOptionPane.YES_OPTION) {
             return;
         }
 
-        String tenKhach = JOptionPane.showInputDialog(this, "Nhap ten khach:");
-        String email = JOptionPane.showInputDialog(this, "Nhap email (tuy chon):");
-        if (tenKhach == null || tenKhach.trim().isEmpty()) tenKhach = "Khach an danh";
-
-        for (String ghe : toBook) {
-            Ve ve = new Ve(p.getTenPhim(), ghe, tenKhach, email);
-            controller.addVe(ve);
-            JOptionPane.showMessageDialog(this, "Dat ve thanh cong!\n" + ve.toString());
+        // Kiểm tra ghế còn trống
+        List<String> failed = controller.bookSeats(idx, toBook);
+        if (!failed.isEmpty()) {
+            areaThongBao.setText("Cac ghe sau da duoc dat: " + failed);
+            showSeatLayout(); // Cập nhật lại sơ đồ
+            return;
         }
 
-        showSeatLayout();
-        loadFilmList();
+        // Nhập thông tin khách hàng
+        String tenKhach = JOptionPane.showInputDialog(this, "Nhap ten khach hang:");
+        if (tenKhach == null || tenKhach.trim().isEmpty()) {
+            tenKhach = "Khach an danh";
+        }
+        
+        String email = JOptionPane.showInputDialog(this, "Nhap email (co the bo qua):");
+
+        // Thanh toán
+        boolean thanhToanThanhCong = xuLyThanhToan(tongTien);
+        
+        if (thanhToanThanhCong) {
+            // Lưu vé vào database
+            for (String ghe : toBook) {
+                Ve ve = new Ve(p.getTenPhim(), ghe, tenKhach, email);
+                controller.addVe(ve);
+            }
+
+            // Hiển thị thông tin vé
+            String thongTinVe = "=== DAT VE THANH CONG ===\n\n" +
+                              "Phim: " + p.getTenPhim() + "\n" +
+                              "Khach hang: " + tenKhach + "\n" +
+                              (email != null && !email.isEmpty() ? "Email: " + email + "\n" : "") +
+                              "Cac ghe: " + String.join(", ", toBook) + "\n" +
+                              "Tong tien: " + formatMoney(tongTien) + "\n\n" +
+                              "Cam on quy khach!";
+            
+            JOptionPane.showMessageDialog(this, thongTinVe, 
+                                        "Thong tin ve", 
+                                        JOptionPane.INFORMATION_MESSAGE);
+            
+            areaThongBao.setText("Da dat " + toBook.size() + " ghe thanh cong!\n" +
+                               "Tong tien: " + formatMoney(tongTien));
+            
+            // Cập nhật lại giao diện
+            showSeatLayout();
+            loadFilmList();
+        } else {
+            areaThongBao.setText("Thanh toan that bai. Vui long thu lai.");
+        }
+    }
+
+    private boolean xuLyThanhToan(int tongTien) {
+        // Hiển thị dialog thanh toán
+        JPanel paymentPanel = new JPanel(new GridLayout(4, 2, 10, 10));
+        paymentPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        JLabel lblTongTien = new JLabel("Tong tien:");
+        JLabel lblSoTien = new JLabel(formatMoney(tongTien));
+        lblSoTien.setFont(new Font("Arial", Font.BOLD, 16));
+        lblSoTien.setForeground(Color.RED);
+        
+        JLabel lblPhuongThuc = new JLabel("Phuong thuc:");
+        String[] phuongThuc = {"Tien mat", "The ngan hang", "Vi dien tu"};
+        JComboBox<String> cbPhuongThuc = new JComboBox<>(phuongThuc);
+        
+        paymentPanel.add(lblTongTien);
+        paymentPanel.add(lblSoTien);
+        paymentPanel.add(lblPhuongThuc);
+        paymentPanel.add(cbPhuongThuc);
+        
+        int result = JOptionPane.showConfirmDialog(this, paymentPanel, 
+                                                   "Thanh toan", 
+                                                   JOptionPane.OK_CANCEL_OPTION,
+                                                   JOptionPane.PLAIN_MESSAGE);
+        
+        if (result == JOptionPane.OK_OPTION) {
+            String method = (String) cbPhuongThuc.getSelectedItem();
+            
+            // Xử lý thanh toán theo phương thức
+            if ("Tien mat".equals(method)) {
+                return xuLyThanhToanTienMat(tongTien);
+            } else {
+                // Giả lập thanh toán điện tử
+                JOptionPane.showMessageDialog(this, 
+                    "Dang xu ly thanh toan qua " + method + "...\nVui long doi...",
+                    "Xu ly thanh toan",
+                    JOptionPane.INFORMATION_MESSAGE);
+                
+                // Giả lập delay
+                try {
+                    Thread.sleep(1500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                
+                JOptionPane.showMessageDialog(this, 
+                    "Thanh toan thanh cong!",
+                    "Ket qua",
+                    JOptionPane.INFORMATION_MESSAGE);
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+    private boolean xuLyThanhToanTienMat(int tongTien) {
+        String input = JOptionPane.showInputDialog(this, 
+            "Tong tien: " + formatMoney(tongTien) + "\nNhap so tien khach dua:");
+        
+        if (input == null) return false;
+        
+        try {
+            int tienKhachDua = Integer.parseInt(input.trim());
+            
+            if (tienKhachDua < tongTien) {
+                JOptionPane.showMessageDialog(this, 
+                    "So tien khong du!\nThieu: " + formatMoney(tongTien - tienKhachDua),
+                    "Loi",
+                    JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+            
+            int tienThua = tienKhachDua - tongTien;
+            String message = "Thanh toan thanh cong!\n\n" +
+                           "Tien khach dua: " + formatMoney(tienKhachDua) + "\n" +
+                           "Tong tien: " + formatMoney(tongTien) + "\n" +
+                           "Tien thua: " + formatMoney(tienThua);
+            
+            JOptionPane.showMessageDialog(this, message, 
+                                        "Hoa don",
+                                        JOptionPane.INFORMATION_MESSAGE);
+            return true;
+            
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, 
+                "Vui long nhap so hop le!",
+                "Loi",
+                JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+    }
+
+    private String formatMoney(int amount) {
+        return String.format("%,d VND", amount);
     }
 }
