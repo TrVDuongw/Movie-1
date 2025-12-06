@@ -23,8 +23,8 @@ public class PhimDAO {
             pstPhim.setInt(3, phim.getThoiLuong());
 
 
-            pstPhim.setInt(4, phim.getSoHangGhe()); 
-            pstPhim.setInt(5, phim.getSoCotGhe()); 
+            pstPhim.setInt(4, phim.getSoHangGhe());
+            pstPhim.setInt(5, phim.getSoCotGhe());
 
             pstPhim.executeUpdate();
 
@@ -46,7 +46,7 @@ public class PhimDAO {
                     pstGhe.setInt(1, phimId);
                     pstGhe.setInt(2, r);
                     pstGhe.setInt(3, c);
-                    pstGhe.setBoolean(4, false); 
+                    pstGhe.setBoolean(4, false);
                     pstGhe.addBatch();
                 }
             }
@@ -72,7 +72,6 @@ public class PhimDAO {
 
         }
     }
-
 
     public ArrayList<Phim> getAllPhim() {
         ArrayList<Phim> list = new ArrayList<>();
@@ -122,7 +121,7 @@ public class PhimDAO {
                 boolean daDat = rs.getBoolean("da_dat");
 
                 if (daDat) {
-                    phim.bookSeat(r, c); 
+                    phim.bookSeat(r, c);
                 }
             }
         } catch (SQLException e) {
@@ -130,7 +129,7 @@ public class PhimDAO {
         }
     }
 
- 
+
     public boolean deletePhim(String tenPhim) {
         String sql = "DELETE FROM phim WHERE ten_phim = ?";
 
