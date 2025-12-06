@@ -1,0 +1,114 @@
+
+CREATE DATABASE IF NOT EXISTS cinema_db;
+USE cinema_db;
+
+
+DROP TABLE IF EXISTS ve;
+DROP TABLE IF EXISTS ghe;
+DROP TABLE IF EXISTS phim;
+
+
+CREATE TABLE phim (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    ten_phim VARCHAR(255) NOT NULL,
+    the_loai VARCHAR(100) NOT NULL,
+    thoi_luong INT NOT NULL COMMENT 'Thời lượng phim tính bằng phút',
+    so_hang_ghe INT NOT NULL DEFAULT 5 COMMENT 'Số hàng ghế',
+    so_cot_ghe INT NOT NULL DEFAULT 8 COMMENT 'Số cột ghế',
+    ngay_tao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_ten_phim (ten_phim)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+CREATE TABLE ghe (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    phim_id INT NOT NULL,
+    row_index INT NOT NULL COMMENT 'Chỉ số hàng (0-based)',
+    col_index INT NOT NULL COMMENT 'Chỉ số cột (0-based)',
+    da_dat BOOLEAN DEFAULT FALSE COMMENT 'TRUE nếu ghế đã được đặt',
+    ngay_cap_nhat TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (phim_id) REFERENCES phim(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_seat (phim_id, row_index, col_index),
+    INDEX idx_phim_id (phim_id),
+    INDEX idx_da_dat (da_dat)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+CREATE TABLE ve (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    ten_phim VARCHAR(255) NOT NULL,
+    ghe VARCHAR(10) NOT NULL COMMENT 'Mã ghế (VD: A1, B2)',
+    ten_khach VARCHAR(255) NOT NULL,
+    email VARCHAR(255) DEFAULT NULL,
+    gia_ve INT NOT NULL DEFAULT 0 COMMENT 'Giá vé (VND)',
+    ngay_dat TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_ten_phim (ten_phim),
+    INDEX idx_ngay_dat (ngay_dat),
+    INDEX idx_ten_khach (ten_khach)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+INSERT INTO phim (ten_phim, the_loai, thoi_luong, so_hang_ghe, so_cot_ghe) VALUES
+('Avengers: Endgame', 'Hanh dong', 181, 5, 8),
+('Conan Movie 26', 'Trinh tham', 110, 5, 7),
+('Doraemon: Phieu luu', 'Hoat hinh', 95, 4, 6);
+
+INSERT INTO ghe (phim_id, row_index, col_index, da_dat)
+SELECT 1, r, c, FALSE
+FROM (SELECT 0 AS r UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4) AS rows
+CROSS JOIN (SELECT 0 AS c UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7) AS cols;
+
+
+INSERT INTO ghe (phim_id, row_index, col_index, da_dat)
+SELECT 2, r, c, FALSE
+FROM (SELECT 0 AS r UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4) AS rows
+CROSS JOIN (SELECT 0 AS c UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6) AS cols;
+
+
+INSERT INTO ghe (phim_id, row_index, col_index, da_dat)
+SELECT 3, r, c, FALSE
+FROM (SELECT 0 AS r UNION SELECT 1 UNION SELECT 2 UNION SELECT 3) AS rows
+CROSS JOIN (SELECT 0 AS c UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5) AS cols;
+
+
+SELECT 'Tổng số phim:' AS Thong_tin, COUNT(*) AS So_luong FROM phim
+UNION ALL
+SELECT 'Tổng số ghế:', COUNT(*) FROM ghe
+UNION ALL
+SELECT 'Tổng số vé đã đặt:', COUNT(*) FROM ve;
+
+
+CREATE OR REPLACE VIEW v_thong_ke_phim AS
+SELECT 
+    p.id,
+    p.ten_phim,
+    p.the_loai,
+    p.thoi_luong,
+    p.so_hang_ghe * p.so_cot_ghe AS tong_ghe,
+    SUM(CASE WHEN g.da_dat = TRUE THEN 1 ELSE 0 END) AS ghe_da_dat,
+    SUM(CASE WHEN g.da_dat = FALSE THEN 1 ELSE 0 END) AS ghe_con_lai,
+    ROUND(SUM(CASE WHEN g.da_dat = TRUE THEN 1 ELSE 0 END) * 100.0 / (p.so_hang_ghe * p.so_cot_ghe), 2) AS ti_le_lap_day
+FROM phim p
+LEFT JOIN ghe g ON p.id = g.phim_id
+GROUP BY p.id, p.ten_phim, p.the_loai, p.thoi_luong, p.so_hang_ghe, p.so_cot_ghe;
+
+
+CREATE OR REPLACE VIEW v_doanh_thu_phim AS
+SELECT 
+    v.ten_phim,
+    COUNT(*) AS so_ve_ban,
+    SUM(CASE 
+        WHEN v.gia_ve > 0 THEN v.gia_ve
+        WHEN v.ghe LIKE 'A%' OR v.ghe LIKE 'B%' THEN 80000
+        ELSE 50000 
+    END) AS doanh_thu,
+    AVG(CASE 
+        WHEN v.gia_ve > 0 THEN v.gia_ve
+        WHEN v.ghe LIKE 'A%' OR v.ghe LIKE 'B%' THEN 80000
+        ELSE 50000 
+    END) AS gia_ve_trung_binh
+FROM ve v
+GROUP BY v.ten_phim;
+
+
+SHOW FULL TABLES WHERE Table_type = 'VIEW';
