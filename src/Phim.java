@@ -18,7 +18,7 @@ public class Phim {
         seats = new boolean[so_hang_ghe][so_cot_ghe];
         for (int r = 0; r < so_hang_ghe; r++)
             for (int c = 0; c < so_cot_ghe; c++)
-                seats[r][c] = true; 
+                seats[r][c] = true;
     }
 
 
