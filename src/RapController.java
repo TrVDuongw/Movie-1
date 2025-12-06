@@ -9,7 +9,7 @@ public class RapController {
         phimDAO = new PhimDAO();
         VeDAO = new VeDAO();
 
-  
+
         if (getDanhSachPhim().isEmpty()) {
             addPhim(new Phim("Avengers: Endgame", "Hanh dong", 181, 5, 8));
             addPhim(new Phim("Conan Movie 26", "Trinh tham", 110, 5, 7));
@@ -18,6 +18,10 @@ public class RapController {
     }
 
 
+    public int getTongDoanhThu() { return VeDAO.getTongDoanhThu(); }
+
+
+    public int getDoanhThuTheoPhim(String tenPhim) { return VeDAO.getDoanhThuTheoPhim(tenPhim); }
     public ArrayList<Phim> getDanhSachPhim() {
         return phimDAO.getAllPhim();
     }
@@ -70,6 +74,7 @@ public class RapController {
         if (!failed.isEmpty()) {
             return failed;
         }
+
 
         for (String lab : labels) {
             int[] rc = phim.labelToRC(lab);
