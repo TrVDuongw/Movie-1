@@ -23,29 +23,4 @@ hỗ trợ đặt vé trực tuyến và quản lý doanh thu.
 
 ## Tài khoản Admin
 - Mật khẩu: `admin`
-```
 
-### 5. 🗂️ **Cấu trúc thư mục đề xuất**
-```
-project/
-├── src/
-│   ├── DatabaseConnection.java
-│   ├── Main.java
-│   ├── Phim.java
-│   ├── PhimDAO.java
-│   ├── Ve.java
-│   ├── VeDAO.java
-│   ├── RapController.java
-│   ├── RapChieuPhim.java
-│   └── RapQuanLy.java
-├── database/
-│   └── cinema_db.sql
-├── docs/
-│   ├── slides.pptx
-│   └── report.pdf
-├── screenshots/
-│   ├── user-interface.png
-│   ├── admin-interface.png
-│   └── seat-selection.png
-├── .gitignore
-└── README.md
