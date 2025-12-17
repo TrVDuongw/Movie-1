@@ -13,6 +13,7 @@ public class RapChieuPhim extends JFrame {
 
     private static final int GIA_VE_THUONG = 50000;
     private static final int GIA_VE_VIP = 80000;
+    private static final int GIA_VE_DOI = 100000;
 
     public RapChieuPhim(RapController controller) {
         this.controller = controller;
@@ -52,7 +53,6 @@ public class RapChieuPhim extends JFrame {
 
         btnLoad.addActionListener(e -> loadFilmList());
         btnQuayLai.addActionListener(e -> {
-            // Xác nhận trước khi quay lại
             int confirm = JOptionPane.showConfirmDialog(this,
                     "Ban co chac chan muon quay lai?\nCac ghe dang chon se bi huy.",
                     "Xac nhan",
@@ -76,7 +76,8 @@ public class RapChieuPhim extends JFrame {
         for (Phim p : controller.getDanhSachPhim()) model.addElement(p.toString());
         areaThongBao.setText("Danh sach phim da duoc cap nhat.\n" +
                 "Ghe VIP (hang A, B): " + formatMoney(GIA_VE_VIP) + "\n" +
-                "Ghe thuong: " + formatMoney(GIA_VE_THUONG));
+                "Ghe thuong: " + formatMoney(GIA_VE_THUONG) + "\n" +
+                "Ghe doi (hang cuoi - chon theo cap): " + formatMoney(GIA_VE_DOI));
         seatPanel.removeAll();
         seatPanel.revalidate();
         seatPanel.repaint();
@@ -113,7 +114,7 @@ public class RapChieuPhim extends JFrame {
         gbc.gridy = 0;
         gbc.gridwidth = so_cot_ghe;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        JLabel screenLabel = new JLabel("=== MÀN HÌNH ===", SwingConstants.CENTER);
+        JLabel screenLabel = new JLabel("=== MAN HINH ===", SwingConstants.CENTER);
         screenLabel.setFont(new Font("Arial", Font.BOLD, 14));
         screenLabel.setOpaque(true);
         screenLabel.setBackground(Color.DARK_GRAY);
@@ -124,24 +125,97 @@ public class RapChieuPhim extends JFrame {
         gbc.fill = GridBagConstraints.BOTH;
 
         for (int r = 0; r < so_hang_ghe; r++) {
+            boolean isLastRow = (r == so_hang_ghe - 1);
+
             for (int c = 0; c < so_cot_ghe; c++) {
                 String label = p.seatLabel(r, c);
                 boolean available = p.isSeatAvailable(r, c);
 
+            
+                if (isLastRow && c % 2 == 0 && c < so_cot_ghe - 1) {
+                    String label1 = p.seatLabel(r, c);
+                    String label2 = p.seatLabel(r, c + 1);
+                    boolean available1 = p.isSeatAvailable(r, c);
+                    boolean available2 = p.isSeatAvailable(r, c + 1);
+
+                    if (available1 && available2) {
+                       
+                        JToggleButton btnDouble = new JToggleButton(label1 + "-" + label2);
+                        btnDouble.setPreferredSize(new Dimension(125, 40));
+                        btnDouble.setBackground(new Color(255, 182, 193));
+                        btnDouble.setToolTipText("Ghe doi - " + formatMoney(GIA_VE_DOI));
+                        btnDouble.setFont(new Font("Arial", Font.BOLD, 10));
+                        btnDouble.setOpaque(true);
+                        btnDouble.setBorderPainted(true);
+
+                       
+                        btnDouble.putClientProperty("seat1", label1);
+                        btnDouble.putClientProperty("seat2", label2);
+                        btnDouble.putClientProperty("isDouble", true);
+
+                        seatButtons.add(btnDouble);
+
+                        gbc.gridx = c;
+                        gbc.gridy = r + 1;
+                        gbc.gridwidth = 2;
+                        mainSeatPanel.add(btnDouble, gbc);
+                        gbc.gridwidth = 1;
+
+                        c++; 
+                    } else {
+                       
+                        for (int i = 0; i < 2 && c + i < so_cot_ghe; i++) {
+                            String lbl = p.seatLabel(r, c + i);
+                            boolean avail = p.isSeatAvailable(r, c + i);
+
+                            if (!avail) {
+                                JLabel lblBooked = new JLabel("X", SwingConstants.CENTER);
+                                lblBooked.setPreferredSize(new Dimension(60, 40));
+                                lblBooked.setOpaque(true);
+                                lblBooked.setBackground(Color.LIGHT_GRAY);
+                                lblBooked.setForeground(Color.RED);
+                                lblBooked.setFont(new Font("Arial", Font.BOLD, 14));
+                                lblBooked.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+                                lblBooked.setToolTipText("Ghe da duoc dat");
+
+                                gbc.gridx = c + i;
+                                gbc.gridy = r + 1;
+                                mainSeatPanel.add(lblBooked, gbc);
+                            }
+                        }
+                        if (available1 || available2) {
+                            c++; 
+                        }
+                    }
+                    continue;
+                }
+
+              
+                if (isLastRow && c % 2 == 1) {
+                    continue;
+                }
+
+             
                 if (available) {
                     JToggleButton btn = new JToggleButton(label);
                     btn.setPreferredSize(new Dimension(60, 40));
 
                     char row = label.charAt(0);
+
+                   
                     if (row == 'A' || row == 'B') {
                         btn.setBackground(new Color(255, 215, 0));
                         btn.setToolTipText("Ghe VIP - " + formatMoney(GIA_VE_VIP));
-                    } else {
-                        btn.setBackground(Color.WHITE);
+                    }
+                   
+                    else {
+                        btn.setBackground(new Color(173, 216, 230));
                         btn.setToolTipText("Ghe thuong - " + formatMoney(GIA_VE_THUONG));
                     }
 
                     btn.setFont(new Font("Arial", Font.BOLD, 10));
+                    btn.setOpaque(true);
+                    btn.setBorderPainted(true);
                     seatButtons.add(btn);
 
                     gbc.gridx = c;
@@ -167,12 +241,22 @@ public class RapChieuPhim extends JFrame {
         JPanel legendPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         legendPanel.setBorder(BorderFactory.createTitledBorder("Chu thich"));
 
-        JLabel vipLegend = new JLabel("■ Ghe VIP (" + formatMoney(GIA_VE_VIP) + ")");
-        vipLegend.setForeground(new Color(255, 215, 0));
+        JLabel vipLegend = new JLabel("  Ghe VIP (" + formatMoney(GIA_VE_VIP) + ")  ");
         vipLegend.setFont(new Font("Arial", Font.BOLD, 12));
+        vipLegend.setOpaque(true);
+        vipLegend.setBackground(new Color(255, 215, 0));
+        vipLegend.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
-        JLabel normalLegend = new JLabel("■ Ghe thuong (" + formatMoney(GIA_VE_THUONG) + ")");
-        normalLegend.setForeground(Color.BLACK);
+        JLabel normalLegend = new JLabel("  Ghe thuong (" + formatMoney(GIA_VE_THUONG) + ")  ");
+        normalLegend.setOpaque(true);
+        normalLegend.setBackground(new Color(173, 216, 230));
+        normalLegend.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
+        JLabel doubleLegend = new JLabel("  Ghe doi (" + formatMoney(GIA_VE_DOI) + ")  ");
+        doubleLegend.setFont(new Font("Arial", Font.BOLD, 12));
+        doubleLegend.setOpaque(true);
+        doubleLegend.setBackground(new Color(255, 182, 193));
+        doubleLegend.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
         JLabel bookedLegend = new JLabel("X Da dat");
         bookedLegend.setForeground(Color.RED);
@@ -181,6 +265,8 @@ public class RapChieuPhim extends JFrame {
         legendPanel.add(vipLegend);
         legendPanel.add(Box.createHorizontalStrut(20));
         legendPanel.add(normalLegend);
+        legendPanel.add(Box.createHorizontalStrut(20));
+        legendPanel.add(doubleLegend);
         legendPanel.add(Box.createHorizontalStrut(20));
         legendPanel.add(bookedLegend);
 
@@ -200,10 +286,23 @@ public class RapChieuPhim extends JFrame {
         }
 
         Phim p = controller.getDanhSachPhim().get(idx);
+        int so_hang_ghe = p.getSoHangGhe();
         List<String> toBook = new ArrayList<>();
+
         for (JToggleButton btn : seatButtons) {
             if (btn.isSelected() && btn.isEnabled()) {
-                toBook.add(btn.getText());
+               
+                Boolean isDouble = (Boolean) btn.getClientProperty("isDouble");
+                if (isDouble != null && isDouble) {
+                
+                    String seat1 = (String) btn.getClientProperty("seat1");
+                    String seat2 = (String) btn.getClientProperty("seat2");
+                    toBook.add(seat1);
+                    toBook.add(seat2);
+                } else {
+              
+                    toBook.add(btn.getText());
+                }
             }
         }
 
@@ -213,18 +312,41 @@ public class RapChieuPhim extends JFrame {
         }
 
         int tongTien = 0;
+        int soGheDoi = 0;
+        int soGheVIP = 0;
+        int soGheThuong = 0;
+
         for (String ghe : toBook) {
             char row = ghe.charAt(0);
-            if (row == 'A' || row == 'B') {
+            int rowIndex = row - 'A';
+
+          
+            if (rowIndex == so_hang_ghe - 1) {
+                tongTien += GIA_VE_DOI / 2; // Mỗi ghế trong cặp đôi
+                soGheDoi++;
+            }
+        
+            else if (row == 'A' || row == 'B') {
                 tongTien += GIA_VE_VIP;
-            } else {
+                soGheVIP++;
+            }
+        
+            else {
                 tongTien += GIA_VE_THUONG;
+                soGheThuong++;
             }
         }
 
+        StringBuilder chiTiet = new StringBuilder();
+        if (soGheVIP > 0) chiTiet.append(soGheVIP).append(" ghe VIP, ");
+        if (soGheThuong > 0) chiTiet.append(soGheThuong).append(" ghe thuong, ");
+        if (soGheDoi > 0) chiTiet.append(soGheDoi / 2).append(" cap ghe doi, ");
+        if (chiTiet.length() > 0) chiTiet.setLength(chiTiet.length() - 2);
+
         String thongTinDat = "Ban dang dat:\n" +
                 "Phim: " + p.getTenPhim() + "\n" +
-                "So ghe: " + toBook.size() + " (" + String.join(", ", toBook) + ")\n" +
+                "Chi tiet: " + chiTiet.toString() + "\n" +
+                "Cac ghe: " + String.join(", ", toBook) + "\n" +
                 "Tong tien: " + formatMoney(tongTien) + "\n\n" +
                 "Ban co chac chan muon dat ve nay?";
 
@@ -253,10 +375,25 @@ public class RapChieuPhim extends JFrame {
         boolean thanhToanThanhCong = xuLyThanhToan(tongTien);
 
         if (thanhToanThanhCong) {
-            // Lưu vé với giá tương ứng
+            
             for (String ghe : toBook) {
                 char row = ghe.charAt(0);
-                int giaVe = (row == 'A' || row == 'B') ? GIA_VE_VIP : GIA_VE_THUONG;
+                int rowIndex = row - 'A';
+                int giaVe;
+
+             
+                if (rowIndex == so_hang_ghe - 1) {
+                    giaVe = GIA_VE_DOI / 2;
+                }
+              
+                else if (row == 'A' || row == 'B') {
+                    giaVe = GIA_VE_VIP;
+                }
+               
+                else {
+                    giaVe = GIA_VE_THUONG;
+                }
+
                 Ve ve = new Ve(p.getTenPhim(), ghe, tenKhach, email, giaVe);
                 controller.addVe(ve);
             }
@@ -265,6 +402,7 @@ public class RapChieuPhim extends JFrame {
                     "Phim: " + p.getTenPhim() + "\n" +
                     "Khach hang: " + tenKhach + "\n" +
                     (email != null && !email.isEmpty() ? "Email: " + email + "\n" : "") +
+                    "Chi tiet: " + chiTiet.toString() + "\n" +
                     "Cac ghe: " + String.join(", ", toBook) + "\n" +
                     "Tong tien: " + formatMoney(tongTien) + "\n\n" +
                     "Cam on quy khach!";
@@ -274,6 +412,7 @@ public class RapChieuPhim extends JFrame {
                     JOptionPane.INFORMATION_MESSAGE);
 
             areaThongBao.setText("Da dat " + toBook.size() + " ghe thanh cong!\n" +
+                    "Chi tiet: " + chiTiet.toString() + "\n" +
                     "Tong tien: " + formatMoney(tongTien));
 
             showSeatLayout();
