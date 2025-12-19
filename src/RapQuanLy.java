@@ -19,7 +19,7 @@ public class RapQuanLy extends JFrame {
 
     public RapQuanLy(RapController controller) {
         this.controller = controller;
-        setTitle("⚙️ Quản lý rạp chiếu phim - ADMIN");
+        setTitle(" Quản lý rạp chiếu phim - ADMIN");
         setSize(1200, 750);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -37,7 +37,7 @@ public class RapQuanLy extends JFrame {
         headerPanel.setBackground(PRIMARY_COLOR);
         headerPanel.setPreferredSize(new Dimension(0, 80));
 
-        JLabel titleLabel = new JLabel("⚙️ HỆ THỐNG QUẢN LÝ RẠP", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel(" HỆ THỐNG QUẢN LÝ RẠP", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
         titleLabel.setForeground(Color.WHITE);
 
@@ -57,7 +57,7 @@ public class RapQuanLy extends JFrame {
         inputPanel.setBackground(Color.WHITE);
         inputPanel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEmptyBorder(10, 10, 10, 10),
-                createTitledBorder("➕ THÊM PHIM MỚI")
+                createTitledBorder(" THÊM PHIM MỚI")
         ));
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -72,11 +72,11 @@ public class RapQuanLy extends JFrame {
         tfCols = createStyledTextField();
         tfCols.setText("8");
 
-        addFormRow(inputPanel, gbc, 0, "🎬 Tên phim:", tfTen);
-        addFormRow(inputPanel, gbc, 1, "🎭 Thể loại:", tfLoai);
-        addFormRow(inputPanel, gbc, 2, "⏱️ Thời lượng (phút):", tfThoiLuong);
-        addFormRow(inputPanel, gbc, 3, "📊 Số hàng ghế:", tfRows);
-        addFormRow(inputPanel, gbc, 4, "📊 Số cột ghế:", tfCols);
+        addFormRow(inputPanel, gbc, 0, " Tên phim:", tfTen);
+        addFormRow(inputPanel, gbc, 1, " Thể loại:", tfLoai);
+        addFormRow(inputPanel, gbc, 2, " Thời lượng (phút):", tfThoiLuong);
+        addFormRow(inputPanel, gbc, 3, " Số hàng ghế:", tfRows);
+        addFormRow(inputPanel, gbc, 4, " Số cột ghế:", tfCols);
 
 
         model = new DefaultListModel<>();
@@ -88,7 +88,7 @@ public class RapQuanLy extends JFrame {
 
         JScrollPane scrollList = new JScrollPane(listPhim);
         scrollList.setPreferredSize(new Dimension(400, 0));
-        scrollList.setBorder(createTitledBorder("📋 DANH SÁCH PHIM"));
+        scrollList.setBorder(createTitledBorder(" DANH SÁCH PHIM"));
 
 
         areaInfo = new JTextArea();
@@ -98,19 +98,19 @@ public class RapQuanLy extends JFrame {
         areaInfo.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         JScrollPane scrollInfo = new JScrollPane(areaInfo);
-        scrollInfo.setBorder(createTitledBorder("ℹ️ THÔNG TIN CHI TIẾT"));
+        scrollInfo.setBorder(createTitledBorder(" THÔNG TIN CHI TIẾT"));
 
 
         JPanel buttonPanel = new JPanel(new GridLayout(2, 3, 10, 10));
         buttonPanel.setBackground(BG_COLOR);
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        JButton btnAdd = createStyledButton("➕ Thêm phim", SUCCESS_COLOR, "🎬");
-        JButton btnDelete = createStyledButton("🗑️ Xóa phim", ACCENT_COLOR, "❌");
-        JButton btnViewSeats = createStyledButton("🪑 Xem sơ đồ ghế", PRIMARY_COLOR, "📊");
-        JButton btnViewTickets = createStyledButton("🎫 Danh sách vé", INFO_COLOR, "📋");
-        JButton btnViewRevenue = createStyledButton("💰 Doanh thu", WARNING_COLOR, "📈");
-        JButton btnQuayLai = createStyledButton("← Quay lại", new Color(52, 73, 94), "🚪");
+        JButton btnAdd = createStyledButton(" Thêm phim", SUCCESS_COLOR, "");
+        JButton btnDelete = createStyledButton(" Xóa phim", ACCENT_COLOR, "");
+        JButton btnViewSeats = createStyledButton(" Xem sơ đồ ghế", PRIMARY_COLOR, "");
+        JButton btnViewTickets = createStyledButton(" Danh sách vé", INFO_COLOR, "");
+        JButton btnViewRevenue = createStyledButton(" Doanh thu", WARNING_COLOR, "");
+        JButton btnQuayLai = createStyledButton("← Quay lại", new Color(52, 73, 94), "");
 
         buttonPanel.add(btnAdd);
         buttonPanel.add(btnDelete);
@@ -210,7 +210,7 @@ public class RapQuanLy extends JFrame {
     private void loadList() {
         model.clear();
         for (Phim p : controller.getDanhSachPhim()) {
-            model.addElement("🎬 " + p.toString());
+            model.addElement(" " + p.toString());
         }
     }
 
@@ -224,24 +224,24 @@ public class RapQuanLy extends JFrame {
 
             if (ten.isEmpty() || loai.isEmpty()) {
                 JOptionPane.showMessageDialog(this,
-                        "⚠️ Vui lòng nhập đầy đủ thông tin.",
+                        " Vui lòng nhập đầy đủ thông tin.",
                         "Cảnh báo", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
             if (rows <= 0 || cols <= 0 || thoi <= 0) {
                 JOptionPane.showMessageDialog(this,
-                        "⚠️ Số hàng ghế, số cột ghế và thời lượng phải lớn hơn 0!",
+                        " Số hàng ghế, số cột ghế và thời lượng phải lớn hơn 0!",
                         "Lỗi", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            String confirmMessage = "✅ XÁC NHẬN THÊM PHIM\n\n" +
-                    "🎬 Tên: " + ten + "\n" +
-                    "🎭 Thể loại: " + loai + "\n" +
-                    "⏱️ Thời lượng: " + thoi + " phút\n" +
-                    "🪑 Số ghế: " + rows + " hàng × " + cols + " cột\n" +
-                    "📊 Tổng: " + (rows * cols) + " ghế";
+            String confirmMessage = " XÁC NHẬN THÊM PHIM\n\n" +
+                    " Tên: " + ten + "\n" +
+                    " Thể loại: " + loai + "\n" +
+                    " Thời lượng: " + thoi + " phút\n" +
+                    " Số ghế: " + rows + " hàng × " + cols + " cột\n" +
+                    " Tổng: " + (rows * cols) + " ghế";
 
             int confirm = JOptionPane.showConfirmDialog(this, confirmMessage,
                     "Xác nhận", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -249,7 +249,7 @@ public class RapQuanLy extends JFrame {
             if (confirm == JOptionPane.YES_OPTION) {
                 controller.addPhim(new Phim(ten, loai, thoi, rows, cols));
                 JOptionPane.showMessageDialog(this,
-                        "✅ Đã thêm phim thành công!",
+                        " Đã thêm phim thành công!",
                         "Thành công", JOptionPane.INFORMATION_MESSAGE);
 
                 tfTen.setText("");
@@ -261,7 +261,7 @@ public class RapQuanLy extends JFrame {
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this,
-                    "❌ Nhập sai định dạng!",
+                    " Nhập sai định dạng!",
                     "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -270,15 +270,15 @@ public class RapQuanLy extends JFrame {
         int idx = listPhim.getSelectedIndex();
         if (idx == -1) {
             JOptionPane.showMessageDialog(this,
-                    "⚠️ Vui lòng chọn phim để xóa",
+                    " Vui lòng chọn phim để xóa",
                     "Cảnh báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         Phim p = controller.getDanhSachPhim().get(idx);
-        String confirmMessage = "⚠️ XÁC NHẬN XÓA PHIM\n\n" +
-                "🎬 \"" + p.getTenPhim() + "\"\n\n" +
-                "❌ CHÚ Ý: Tất cả vé đã đặt và thông tin ghế\ncủa phim này sẽ bị xóa!";
+        String confirmMessage = " XÁC NHẬN XÓA PHIM\n\n" +
+                " \"" + p.getTenPhim() + "\"\n\n" +
+                " CHÚ Ý: Tất cả vé đã đặt và thông tin ghế\ncủa phim này sẽ bị xóa!";
 
         int confirm = JOptionPane.showConfirmDialog(this, confirmMessage,
                 "Xác nhận xóa", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -287,13 +287,13 @@ public class RapQuanLy extends JFrame {
             boolean success = controller.removePhim(idx);
             if (success) {
                 JOptionPane.showMessageDialog(this,
-                        "✅ Đã xóa phim thành công!",
+                        " Đã xóa phim thành công!",
                         "Thành công", JOptionPane.INFORMATION_MESSAGE);
                 areaInfo.setText("");
                 loadList();
             } else {
                 JOptionPane.showMessageDialog(this,
-                        "❌ Xóa phim thất bại!",
+                        " Xóa phim thất bại!",
                         "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
         }
@@ -303,7 +303,7 @@ public class RapQuanLy extends JFrame {
         int idx = listPhim.getSelectedIndex();
         if (idx == -1) {
             JOptionPane.showMessageDialog(this,
-                    "⚠️ Vui lòng chọn phim để xem ghế.",
+                    " Vui lòng chọn phim để xem ghế.",
                     "Cảnh báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -312,26 +312,26 @@ public class RapQuanLy extends JFrame {
         StringBuilder sb = new StringBuilder();
 
         sb.append("╔════════════════════════════════════════╗\n");
-        sb.append("║        🪑 SƠ ĐỒ GHẾ NGỒI              ║\n");
+        sb.append("║         SƠ ĐỒ GHẾ NGỒI              ║\n");
         sb.append("╠════════════════════════════════════════╣\n");
-        sb.append("║  🎬 Phim: ").append(p.getTenPhim()).append("\n");
+        sb.append("║   Phim: ").append(p.getTenPhim()).append("\n");
         sb.append("╚════════════════════════════════════════╝\n\n");
 
         int tongGhe = p.getSoHangGhe() * p.getSoCotGhe();
         int gheConLai = p.availableCount();
         int gheDaDat = tongGhe - gheConLai;
 
-        sb.append("📊 THỐNG KÊ:\n");
+        sb.append(" THỐNG KÊ:\n");
         sb.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
-        sb.append("  📍 Tổng số ghế:  ").append(tongGhe).append("\n");
-        sb.append("  ✅ Ghế còn lại:  ").append(gheConLai).append("\n");
-        sb.append("  ❌ Ghế đã đặt:   ").append(gheDaDat).append("\n");
-        sb.append("  📈 Tỷ lệ lấp đầy: ").append(String.format("%.1f%%", (gheDaDat * 100.0 / tongGhe))).append("\n");
+        sb.append("   Tổng số ghế:  ").append(tongGhe).append("\n");
+        sb.append("   Ghế còn lại:  ").append(gheConLai).append("\n");
+        sb.append("   Ghế đã đặt:   ").append(gheDaDat).append("\n");
+        sb.append("   Tỷ lệ lấp đầy: ").append(String.format("%.1f%%", (gheDaDat * 100.0 / tongGhe))).append("\n");
         sb.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
 
-        sb.append("🎯 CHÚ THÍCH:\n");
-        sb.append("  ✅ [  ] = Ghế trống\n");
-        sb.append("  ❌ [ X ] = Ghế đã đặt\n\n");
+        sb.append(" CHÚ THÍCH:\n");
+        sb.append("   [  ] = Ghế trống\n");
+        sb.append("   [ X ] = Ghế đã đặt\n\n");
 
         sb.append("═══════════════════════════════════\n");
         sb.append("          🎬 MÀN HÌNH 🎬\n");
@@ -353,20 +353,20 @@ public class RapQuanLy extends JFrame {
         StringBuilder sb = new StringBuilder();
 
         sb.append("╔════════════════════════════════════════╗\n");
-        sb.append("║       🎫 DANH SÁCH VÉ ĐÃ ĐẶT         ║\n");
+        sb.append("║        DANH SÁCH VÉ ĐÃ ĐẶT         ║\n");
         sb.append("╚════════════════════════════════════════╝\n\n");
 
         ArrayList<Ve> danhSachVe = controller.getDanhSachVe();
 
         if (danhSachVe.isEmpty()) {
-            sb.append("  ℹ️ Chưa có vé nào được đặt.\n");
+            sb.append("   Chưa có vé nào được đặt.\n");
         } else {
-            sb.append("📊 Tổng số vé: ").append(danhSachVe.size()).append("\n\n");
+            sb.append(" Tổng số vé: ").append(danhSachVe.size()).append("\n\n");
 
             for (int i = 0; i < danhSachVe.size(); i++) {
                 Ve v = danhSachVe.get(i);
                 sb.append("┌─────────────────────────────────┐\n");
-                sb.append("│  🎫 Vé #").append(i + 1).append("\n");
+                sb.append("│   Vé #").append(i + 1).append("\n");
                 sb.append("├─────────────────────────────────┤\n");
                 sb.append("│  ").append(v.toString().replace("\n", "\n│  ")).append("\n");
                 sb.append("└─────────────────────────────────┘\n\n");
@@ -380,22 +380,22 @@ public class RapQuanLy extends JFrame {
         StringBuilder sb = new StringBuilder();
 
         sb.append("╔════════════════════════════════════════╗\n");
-        sb.append("║       💰 BÁO CÁO DOANH THU            ║\n");
+        sb.append("║        BÁO CÁO DOANH THU            ║\n");
         sb.append("╚════════════════════════════════════════╝\n\n");
 
         int tongDoanhThu = controller.getTongDoanhThu();
         sb.append("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n");
-        sb.append("┃  💵 TỔNG DOANH THU                 ┃\n");
+        sb.append("┃   TỔNG DOANH THU                 ┃\n");
         sb.append("┃  ").append(formatMoney(tongDoanhThu)).append("\n");
         sb.append("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n\n");
 
-        sb.append("📊 DOANH THU THEO PHIM:\n");
+        sb.append(" DOANH THU THEO PHIM:\n");
         sb.append("═══════════════════════════════════════\n\n");
 
         ArrayList<Phim> danhSachPhim = controller.getDanhSachPhim();
 
         if (danhSachPhim.isEmpty()) {
-            sb.append("  ℹ️ Chưa có phim nào.\n");
+            sb.append("   Chưa có phim nào.\n");
         } else {
             for (Phim p : danhSachPhim) {
                 int doanhThuPhim = controller.getDoanhThuTheoPhim(p.getTenPhim());
@@ -405,24 +405,24 @@ public class RapQuanLy extends JFrame {
                 double tiLe = (tongGhe > 0) ? (gheDaDat * 100.0 / tongGhe) : 0;
 
                 sb.append("┌────────────────────────────────┐\n");
-                sb.append("│ 🎬 ").append(p.getTenPhim()).append("\n");
+                sb.append("│  ").append(p.getTenPhim()).append("\n");
                 sb.append("├────────────────────────────────┤\n");
-                sb.append("│  💰 Doanh thu:    ").append(formatMoney(doanhThuPhim)).append("\n");
-                sb.append("│  🎫 Số vé bán:    ").append(gheDaDat).append("/").append(tongGhe).append("\n");
-                sb.append("│  📈 Tỷ lệ lấp:    ").append(String.format("%.1f%%", tiLe)).append("\n");
+                sb.append("│   Doanh thu:    ").append(formatMoney(doanhThuPhim)).append("\n");
+                sb.append("│   Số vé bán:    ").append(gheDaDat).append("/").append(tongGhe).append("\n");
+                sb.append("│   Tỷ lệ lấp:    ").append(String.format("%.1f%%", tiLe)).append("\n");
                 sb.append("└────────────────────────────────┘\n\n");
             }
         }
 
         ArrayList<Ve> danhSachVe = controller.getDanhSachVe();
         sb.append("═══════════════════════════════════════\n");
-        sb.append("📊 THỐNG KÊ TỔNG QUAN:\n");
+        sb.append(" THỐNG KÊ TỔNG QUAN:\n");
         sb.append("───────────────────────────────────────\n");
-        sb.append("  🎫 Tổng số vé đã bán: ").append(danhSachVe.size()).append("\n");
+        sb.append("   Tổng số vé đã bán: ").append(danhSachVe.size()).append("\n");
 
         if (danhSachVe.size() > 0) {
             int trungBinhGiaVe = tongDoanhThu / danhSachVe.size();
-            sb.append("  💵 Giá vé trung bình: ").append(formatMoney(trungBinhGiaVe)).append("\n");
+            sb.append("   Giá vé trung bình: ").append(formatMoney(trungBinhGiaVe)).append("\n");
         }
         sb.append("───────────────────────────────────────\n");
 
